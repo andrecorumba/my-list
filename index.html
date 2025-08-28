@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Tarefas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Transição simples para a visibilidade do conteúdo das abas */
+        .tab-content {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        .tab-content.hidden {
+            opacity: 0;
+            transform: translateY(10px);
+            position: absolute;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl font-bold text-gray-900">Gestor de Tarefas</h1>
+            <p class="text-gray-600 mt-2">Organize as suas tarefas, projetos e lista de leitura num só lugar.</p>
+        </header>
+
+        <main class="bg-white rounded-2xl shadow-lg p-6 min-h-[500px]">
+            <!-- Abas de Navegação -->
+            <div class="border-b border-gray-200 mb-6">
+                <nav class="flex space-x-4 -mb-px" aria-label="Tabs">
+                    <button id="tab-inbox" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-indigo-500 text-indigo-600">
+                        Caixa de Entrada <span id="inbox-count" class="count-badge bg-indigo-100 text-indigo-600">0</span>
+                    </button>
+                    <button id="tab-projects" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        Projetos <span id="projects-count" class="count-badge bg-gray-200 text-gray-700">0</span>
+                    </button>
+                    <button id="tab-reading" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        Lista de Leitura <span id="reading-count" class="count-badge bg-gray-200 text-gray-700">0</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Conteúdo das Abas -->
+            <div class="relative">
+                <!-- Secção Caixa de Entrada -->
+                <div id="content-inbox" class="tab-content">
+                    <form id="inbox-form" class="flex gap-3 mb-6">
+                        <input type="text" id="inbox-input" placeholder="Adicione um novo item à sua caixa de entrada..." class="flex-grow bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" required>
+                        <button type="submit" class="text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Adicionar</button>
+                    </form>
+                    <ul id="inbox-list" class="space-y-2"></ul>
+                </div>
+
+                <!-- Secção Projetos -->
+                <div id="content-projects" class="tab-content hidden">
+                    <form id="project-form" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                        <input type="text" id="project-task-input" placeholder="Insira uma tarefa..." class="sm:col-span-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" required>
+                        <select id="project-select" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+                            <option value="new-project">Criar Novo Projeto</option>
+                        </select>
+                        <input type="text" id="new-project-input" placeholder="Nome do novo projeto..." class="sm:col-span-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+                        <button type="submit" class="sm:col-span-1 text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Adicionar Tarefa</button>
+                    </form>
+                    <div id="project-list" class="space-y-4"></div>
+                </div>
+
+                <!-- Secção Lista de Leitura -->
+                <div id="content-reading" class="tab-content hidden">
+                    <form id="reading-form" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                        <input type="text" id="reading-title-input" placeholder="Título..." class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" required>
+                        <input type="url" id="reading-link-input" placeholder="https://exemplo.com" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" required>
+                        <button type="submit" class="sm:col-span-2 text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Adicionar à Lista</button>
+                    </form>
+                    <ul id="reading-list" class="space-y-2"></ul>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Secção de Gestão de Dados -->
+        <footer class="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
+            <button id="export-csv" class="w-full sm:w-auto text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Exportar para CSV</button>
+            <button id="import-csv" class="w-full sm:w-auto text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Importar de CSV</button>
+            <input type="file" id="csv-file-input" class="hidden" accept=".csv">
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Elementos do DOM
+            const tabs = {
+                inbox: document.getElementById('tab-inbox'),
+                projects: document.getElementById('tab-projects'),
+                reading: document.getElementById('tab-reading'),
+            };
+            const contents = {
+                inbox: document.getElementById('content-inbox'),
+                projects: document.getElementById('content-projects'),
+                reading: document.getElementById('content-reading'),
+            };
+            const counts = {
+                inbox: document.getElementById('inbox-count'),
+                projects: document.getElementById('projects-count'),
+                reading: document.getElementById('reading-count'),
+            };
+            const lists = {
+                inbox: document.getElementById('inbox-list'),
+                projects: document.getElementById('project-list'),
+                reading: document.getElementById('reading-list'),
+            };
+            const forms = {
+                inbox: document.getElementById('inbox-form'),
+                projects: document.getElementById('project-form'),
+                reading: document.getElementById('reading-form'),
+            };
+            const inputs = {
+                inbox: document.getElementById('inbox-input'),
+                projectTask: document.getElementById('project-task-input'),
+                projectSelect: document.getElementById('project-select'),
+                newProject: document.getElementById('new-project-input'),
+                readingTitle: document.getElementById('reading-title-input'),
+                readingLink: document.getElementById('reading-link-input'),
+            };
+            const exportBtn = document.getElementById('export-csv');
+            const importBtn = document.getElementById('import-csv');
+            const fileInput = document.getElementById('csv-file-input');
+
+            // --- GESTÃO DE ESTADO ---
+            let state = {
+                inbox: [],
+                projects: [], // { task: '...', project: '...' }
+                reading: [],  // { title: '...', link: '...' }
+                activeTab: 'inbox'
+            };
+
+            // --- LOCAL STORAGE ---
+            const saveData = () => {
+                localStorage.setItem('taskManagerData', JSON.stringify(state));
+            };
+
+            const loadData = () => {
+                const data = localStorage.getItem('taskManagerData');
+                if (data) {
+                    state = JSON.parse(data);
+                }
+            };
+
+            // --- LÓGICA DE RENDERIZAÇÃO ---
+            const render = () => {
+                renderTabs();
+                renderInbox();
+                renderProjects();
+                renderReading();
+                updateCounts();
+                saveData();
+            };
+
+            const renderTabs = () => {
+                Object.keys(tabs).forEach(key => {
+                    const tab = tabs[key];
+                    const content = contents[key];
+                    const countBadge = tab.querySelector('.count-badge');
+                    
+                    if (key === state.activeTab) {
+                        tab.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                        tab.classList.add('border-indigo-500', 'text-indigo-600');
+                        countBadge.classList.remove('bg-gray-200', 'text-gray-700');
+                        countBadge.classList.add('bg-indigo-100', 'text-indigo-600');
+                        content.classList.remove('hidden');
+                    } else {
+                        tab.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                        tab.classList.remove('border-indigo-500', 'text-indigo-600');
+                        countBadge.classList.add('bg-gray-200', 'text-gray-700');
+                        countBadge.classList.remove('bg-indigo-100', 'text-indigo-600');
+                        content.classList.add('hidden');
+                    }
+                });
+            };
+
+            const createListItem = (content, onDelete) => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-200';
+                li.innerHTML = `<div>${content}</div>`;
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.innerHTML = `&times;`;
+                deleteBtn.className = 'text-red-500 hover:text-red-700 font-bold text-xl px-2';
+                deleteBtn.onclick = onDelete;
+                
+                li.appendChild(deleteBtn);
+                return li;
+            };
+
+            const renderInbox = () => {
+                lists.inbox.innerHTML = '';
+                state.inbox.forEach((item, index) => {
+                    const li = createListItem(item, () => {
+                        state.inbox.splice(index, 1);
+                        render();
+                    });
+                    lists.inbox.appendChild(li);
+                });
+            };
+
+            const renderProjects = () => {
+                lists.projects.innerHTML = '';
+                const projectsGrouped = state.projects.reduce((acc, item) => {
+                    acc[item.project] = acc[item.project] || [];
+                    acc[item.project].push(item);
+                    return acc;
+                }, {});
+
+                // Atualiza o dropdown de projetos
+                const currentProjectSelection = inputs.projectSelect.value;
+                inputs.projectSelect.innerHTML = '<option value="new-project">Criar Novo Projeto</option>';
+                Object.keys(projectsGrouped).forEach(projectName => {
+                    const option = document.createElement('option');
+                    option.value = projectName;
+                    option.textContent = projectName;
+                    inputs.projectSelect.appendChild(option);
+                });
+                // Mantém a seleção do projeto se ele ainda existir
+                if (Object.keys(projectsGrouped).includes(currentProjectSelection)) {
+                    inputs.projectSelect.value = currentProjectSelection;
+                }
+
+
+                Object.keys(projectsGrouped).forEach(projectName => {
+                    const projectContainer = document.createElement('div');
+                    projectContainer.className = 'mb-4';
+                    
+                    const title = document.createElement('h3');
+                    title.className = 'text-lg font-semibold text-gray-700 mb-2';
+                    title.textContent = projectName;
+                    projectContainer.appendChild(title);
+                    
+                    const ul = document.createElement('ul');
+                    ul.className = 'space-y-2';
+                    
+                    projectsGrouped[projectName].forEach(task => {
+                        const li = createListItem(task.task, () => {
+                            const originalIndex = state.projects.findIndex(p => p.task === task.task && p.project === task.project);
+                            if (originalIndex > -1) {
+                                state.projects.splice(originalIndex, 1);
+                                render();
+                            }
+                        });
+                        ul.appendChild(li);
+                    });
+                    
+                    projectContainer.appendChild(ul);
+                    lists.projects.appendChild(projectContainer);
+                });
+                
+                // CORREÇÃO 1: Garante que o campo de novo projeto aparece ou desaparece conforme a seleção
+                if (inputs.projectSelect.value === 'new-project') {
+                    inputs.newProject.classList.remove('hidden');
+                } else {
+                    inputs.newProject.classList.add('hidden');
+                }
+            };
+
+            const renderReading = () => {
+                lists.reading.innerHTML = '';
+                state.reading.forEach((item, index) => {
+                    const content = `<a href="${item.link}" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline font-medium">${item.title}</a><span class="text-gray-500 text-sm ml-2">(${new URL(item.link).hostname})</span>`;
+                    const li = createListItem(content, () => {
+                        state.reading.splice(index, 1);
+                        render();
+                    });
+                    lists.reading.appendChild(li);
+                });
+            };
+
+            const updateCounts = () => {
+                counts.inbox.textContent = state.inbox.length;
+                counts.projects.textContent = state.projects.length;
+                counts.reading.textContent = state.reading.length;
+            };
+
+            // --- EVENT LISTENERS ---
+            Object.keys(tabs).forEach(key => {
+                tabs[key].addEventListener('click', () => {
+                    state.activeTab = key;
+                    render(); // Usar render() para garantir que tudo é atualizado, incluindo a visibilidade do campo de projeto
+                });
+            });
+
+            forms.inbox.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const value = inputs.inbox.value.trim();
+                if (value) {
+                    state.inbox.push(value);
+                    inputs.inbox.value = '';
+                    render();
+                }
+            });
+            
+            inputs.projectSelect.addEventListener('change', () => {
+                // A lógica agora está centralizada na função renderProjects() para consistência
+                renderProjects();
+            });
+
+            forms.projects.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const task = inputs.projectTask.value.trim();
+                let project = inputs.projectSelect.value;
+                const isNewProject = project === 'new-project';
+                
+                if (isNewProject) {
+                    project = inputs.newProject.value.trim();
+                }
+
+                // CORREÇÃO 2: Validação e feedback visual para o utilizador
+                inputs.projectTask.classList.remove('border-red-500');
+                inputs.newProject.classList.remove('border-red-500');
+
+                if (task && project) {
+                    state.projects.push({ task, project });
+                    inputs.projectTask.value = '';
+                    inputs.newProject.value = '';
+                    render();
+                } else {
+                    if (!task) {
+                        inputs.projectTask.classList.add('border-red-500');
+                    }
+                    if (!project && isNewProject) {
+                        inputs.newProject.classList.add('border-red-500');
+                    }
+                }
+            });
+
+            forms.reading.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const title = inputs.readingTitle.value.trim();
+                const link = inputs.readingLink.value.trim();
+                if (title && link) {
+                    state.reading.push({ title, link });
+                    inputs.readingTitle.value = '';
+                    inputs.readingLink.value = '';
+                    render();
+                }
+            });
+
+            // --- FUNCIONALIDADE CSV ---
+            const escapeCsvCell = (cell) => {
+                if (cell.includes(',') || cell.includes('"') || cell.includes('\n')) {
+                    return `"${cell.replace(/"/g, '""')}"`;
+                }
+                return cell;
+            };
+
+            const parseCsvRow = (row) => {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+                for (let i = 0; i < row.length; i++) {
+                    const char = row[i];
+                    if (char === '"') {
+                        if (inQuotes && row[i + 1] === '"') {
+                            current += '"';
+                            i++; // Pula a próxima aspa
+                        } else {
+                            inQuotes = !inQuotes;
+                        }
+                    } else if (char === ',' && !inQuotes) {
+                        result.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                result.push(current.trim());
+                return result;
+            };
+
+            exportBtn.addEventListener('click', () => {
+                let csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += "type,value1,value2\n"; // Cabeçalho
+
+                state.inbox.forEach(item => {
+                    csvContent += `Inbox,${escapeCsvCell(item)},\n`;
+                });
+                state.projects.forEach(item => {
+                    csvContent += `Project,${escapeCsvCell(item.task)},${escapeCsvCell(item.project)}\n`;
+                });
+                state.reading.forEach(item => {
+                    csvContent += `Reading,${escapeCsvCell(item.title)},${escapeCsvCell(item.link)}\n`;
+                });
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "gestor_de_tarefas_export.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            importBtn.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const text = e.target.result;
+                    const rows = text.split('\n').slice(1); // Pula a linha do cabeçalho
+                    
+                    state.inbox = [];
+                    state.projects = [];
+                    state.reading = [];
+
+                    rows.forEach(row => {
+                        if (row.trim() === '') return;
+                        const columns = parseCsvRow(row); // Usa o novo parser robusto
+                        const type = columns[0];
+                        const val1 = columns[1];
+                        const val2 = columns[2];
+
+                        if (type === 'Inbox' && val1) {
+                            state.inbox.push(val1);
+                        } else if (type === 'Project' && val1 && val2) {
+                            state.projects.push({ task: val1, project: val2 });
+                        } else if (type === 'Reading' && val1 && val2) {
+                            state.reading.push({ title: val1, link: val2 });
+                        }
+                    });
+                    render();
+                };
+                reader.readAsText(file);
+                fileInput.value = ''; // Limpa para a próxima importação
+            });
+
+            // --- INICIALIZAÇÃO ---
+            // Remove a classe 'hidden' do input de novo projeto no HTML inicial para que a lógica JS controle totalmente
+            document.getElementById('new-project-input').classList.add('hidden');
+            loadData();
+            render();
+        });
+    </script>
+</body>
+</html>
