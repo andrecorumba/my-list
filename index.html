@@ -4,12 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor de Tarefas</title>
+    
+    <script>
+      tailwind.config = {
+        darkMode: 'class'
+      }
+    </script>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <script>
-        // Lógica de tema aprimorada para ser executada antes do carregamento da página
+        // Lógica de tema para evitar "flash" ao carregar a página
         const theme = localStorage.getItem('theme');
         if (theme === 'dark') {
             document.documentElement.classList.add('dark');
@@ -57,22 +66,18 @@
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
 
-    <!-- Container Principal -->
     <div class="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
         <header class="relative mb-8 text-center">
             <h1 class="text-4xl font-bold text-gray-900 dark:text-gray-100">Gestor de Tarefas</h1>
             <p class="text-gray-600 dark:text-gray-400 mt-2">Organize as suas tarefas, projetos e lista de leitura num só lugar.</p>
             
-            <!-- Botão de Alternar Tema -->
             <button id="theme-toggle" type="button" class="absolute top-0 right-0 p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm">
                 <svg id="theme-icon-moon" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
                 <svg id="theme-icon-sun" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
             </button>
         </header>
 
-        <!-- Conteúdo Principal (Abas e Listas) -->
         <main class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 min-h-[500px]">
-            <!-- Navegação por Abas -->
             <div class="border-b border-gray-200 dark:border-gray-700 mb-6">
                 <nav class="flex space-x-4 -mb-px" aria-label="Tabs">
                     <button id="tab-inbox" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
@@ -88,7 +93,6 @@
             </div>
 
             <div class="relative">
-                <!-- Conteúdo da Aba: Caixa de Entrada -->
                 <div id="content-inbox" class="tab-content">
                     <form id="inbox-form" class="flex gap-3 mb-6">
                         <input type="text" id="inbox-input" placeholder="Adicione um novo item à sua caixa de entrada..." class="flex-grow bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500" required>
@@ -97,7 +101,6 @@
                     <ul id="inbox-list" class="space-y-2"></ul>
                 </div>
 
-                <!-- Conteúdo da Aba: Projetos -->
                 <div id="content-projects" class="tab-content hidden">
                     <form id="project-form" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
                         <input type="text" id="project-task-input" placeholder="Insira uma tarefa..." class="sm:col-span-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500" required>
@@ -110,7 +113,6 @@
                     <div id="project-list" class="space-y-4"></div>
                 </div>
 
-                <!-- Conteúdo da Aba: Lista de Leitura -->
                 <div id="content-reading" class="tab-content hidden">
                     <form id="reading-form" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
                         <input type="text" id="reading-title-input" placeholder="Título..." class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500" required>
@@ -122,7 +124,6 @@
             </div>
         </main>
         
-        <!-- Rodapé com Botões de Ação -->
         <footer class="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
             <button id="export-csv" class="w-full sm:w-auto text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Exportar para CSV</button>
             <button id="import-csv" class="w-full sm:w-auto text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Importar de CSV</button>
@@ -130,7 +131,6 @@
         </footer>
     </div>
 
-    <!-- Elemento para Notificação (Toast) -->
     <div id="toast-notification" class="bg-gray-900 dark:bg-gray-100 text-white dark:text-black py-2 px-5 rounded-lg shadow-xl">
         <p id="toast-message"></p>
     </div>
@@ -187,10 +187,8 @@
             };
 
             // --- FUNÇÕES AUXILIARES ---
-            // Função para gerar IDs únicos
             const generateId = () => '_' + Math.random().toString(36).substr(2, 9);
 
-            // Função para mostrar notificações (toast)
             let toastTimeout;
             const showToast = (message) => {
                 clearTimeout(toastTimeout);
@@ -201,7 +199,6 @@
                 }, 3000); 
             };
 
-            // Função para gerar cores com base no nome do projeto
             const getProjectColors = (str) => {
                 let hash = 0;
                 for (let i = 0; i < str.length; i++) {
@@ -358,9 +355,7 @@
             themeToggleBtn.addEventListener('click', () => {
                 const isDark = document.documentElement.classList.toggle('dark');
                 localStorage.setItem('theme', isDark ? 'dark' : 'light');
-                if (state.activeTab === 'projects') {
-                    renderProjects();
-                }
+                render(); // CORREÇÃO: Chamar render() para redesenhar toda a UI
             });
 
             Object.keys(tabs).forEach(key => {
@@ -483,23 +478,36 @@
                         rows.forEach(row => {
                             if (row.trim() === '') return;
                             const columns = parseCsvRow(row);
-                            const id = columns[0]?.trim();
+                            
+                            // --- INÍCIO DA CORREÇÃO CSV ---
+                            let id = columns[0]?.trim();
                             const type = columns[1]?.trim();
                             const val1 = columns[2]?.trim();
                             const val2 = columns[3]?.trim();
 
-                            if (!id || existingIds.has(id)) return; // Ignora se não tiver ID ou se o ID já existir
+                            // Se o ID for nulo, '0', ou já existir, gera um novo.
+                            if (!id || id === '0' || existingIds.has(id)) {
+                                id = generateId();
+                            }
 
+                            let itemAdded = false;
                             if (type === 'Inbox' && val1) {
                                 state.inbox.push({ id, text: val1 });
-                                importedCount++;
+                                itemAdded = true;
                             } else if (type === 'Project' && val1 && val2) {
                                 state.projects.push({ id, task: val1, project: val2 });
-                                importedCount++;
+                                itemAdded = true;
                             } else if (type === 'Reading' && val1 && val2) {
                                 state.reading.push({ id, title: val1, link: val2 });
+                                itemAdded = true;
+                            }
+
+                            if (itemAdded) {
+                                // Adiciona o ID (novo ou antigo) ao conjunto para evitar duplicados dentro do mesmo arquivo
+                                existingIds.add(id);
                                 importedCount++;
                             }
+                            // --- FIM DA CORREÇÃO CSV ---
                         });
 
                         if (importedCount === 0) {
