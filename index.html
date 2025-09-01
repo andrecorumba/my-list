@@ -68,18 +68,6 @@
         }
 
         /* Estilos para a Visão Semanal e Arrastar e Soltar */
-        .week-grid {
-            display: grid;
-            grid-template-columns: repeat(1, 1fr);
-            gap: 1rem;
-        }
-
-        @media (min-width: 1024px) { /* Em telas maiores (lg) */
-            .week-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-        
         .day-column {
             min-height: 200px;
             border: 2px dashed transparent;
@@ -125,6 +113,30 @@
                 opacity: 0;
             }
         }
+        
+        /* Estilos para a barra de rolagem personalizada */
+        .overflow-y-auto::-webkit-scrollbar {
+            width: 8px;
+        }
+        .overflow-y-auto::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .overflow-y-auto::-webkit-scrollbar-thumb {
+            background-color: #a0aec0; /* Tailwind gray-400 */
+            border-radius: 4px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
+        .dark .overflow-y-auto::-webkit-scrollbar-thumb {
+            background-color: #4a5568; /* Tailwind gray-600 */
+        }
+        .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+            background-color: #718096; /* Tailwind gray-500 */
+        }
+        .dark .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+             background-color: #2d3748; /* Tailwind gray-700 */
+        }
+
     </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
@@ -180,7 +192,7 @@
                 </div>
 
                 <div id="content-week" class="tab-content hidden">
-                    <div id="week-view" class="week-grid"></div>
+                    <div id="week-view"></div>
                 </div>
 
                 <div id="content-reading" class="tab-content hidden">
@@ -629,7 +641,7 @@
             };
             
             const renderWeek = () => {
-                lists.week.innerHTML = '';
+                lists.week.innerHTML = ''; // Clear existing content
                 const weekDays = {
                     unscheduled: 'Não Agendadas',
                     monday: 'Segunda-feira',
@@ -653,19 +665,32 @@
 
                 const allTasks = [...state.inbox, ...state.projects];
 
-                Object.keys(weekDays).forEach(dayKey => {
+                // --- Main container for the new layout ---
+                const mainLayoutContainer = document.createElement('div');
+                mainLayoutContainer.className = 'grid grid-cols-1 lg:grid-cols-4 lg:items-start gap-6';
+
+                // --- Helper function to create a day's column ---
+                const createDayColumn = (dayKey) => {
                     const column = document.createElement('div');
-                    column.className = 'bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 day-column';
+                    column.className = 'bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 day-column flex flex-col';
                     column.dataset.day = dayKey;
 
                     const header = document.createElement('h3');
                     header.textContent = weekDays[dayKey];
-                    header.className = `text-lg font-bold mb-4 p-2 rounded-md text-center ${dayColors[dayKey]}`;
+                    header.className = `text-lg font-bold mb-4 p-2 rounded-md text-center flex-shrink-0`;
+                    header.classList.add(...dayColors[dayKey].split(' '));
                     column.appendChild(header);
 
                     const taskList = document.createElement('ul');
                     taskList.className = 'space-y-3';
                     
+                    // Conditionally add scrollbar to Unscheduled column's task list
+                    if (dayKey === 'unscheduled') {
+                        // Using vh for a height relative to the viewport. 
+                        // Added padding for scrollbar spacing.
+                        taskList.classList.add('max-h-[60vh]', 'overflow-y-auto', 'pr-2');
+                    }
+
                     const tasksForDay = allTasks.filter(task => (task.day || 'unscheduled') === dayKey);
 
                     tasksForDay.forEach(task => {
@@ -712,7 +737,6 @@
                         completeBtn.addEventListener('click', (e) => {
                             triggerFireworks(e.currentTarget);
                             
-                            // Remover a tarefa do estado
                             let index = state.inbox.findIndex(t => t.id === task.id);
                             if (index > -1) {
                                 state.inbox.splice(index, 1);
@@ -731,10 +755,30 @@
                     });
                     
                     column.appendChild(taskList);
-                    lists.week.appendChild(column);
-                });
+                    return column;
+                };
 
-                // Adicionar event listeners para drag and drop nas colunas
+                // --- Create and add the Unscheduled column to the main layout ---
+                const unscheduledCol = createDayColumn('unscheduled');
+                mainLayoutContainer.appendChild(unscheduledCol);
+
+                // --- Create a grid container for the days of the week ---
+                const weekDaysGrid = document.createElement('div');
+                weekDaysGrid.className = 'lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4';
+
+                // --- Create and add the day columns to their own grid ---
+                Object.keys(weekDays).forEach(dayKey => {
+                    if (dayKey !== 'unscheduled') {
+                        const dayCol = createDayColumn(dayKey);
+                        weekDaysGrid.appendChild(dayCol);
+                    }
+                });
+                mainLayoutContainer.appendChild(weekDaysGrid);
+
+                // Append the new layout to the main week view container
+                lists.week.appendChild(mainLayoutContainer);
+
+                // --- Add drag and drop listeners to all columns ---
                 const dayColumns = lists.week.querySelectorAll('.day-column');
                 dayColumns.forEach(col => {
                     col.addEventListener('dragover', (e) => {
